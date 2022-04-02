@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToDos</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+  <h1>todos</h1>
+  <div class="container">
+    
+    <div class="inputbox">
+      <button class="finishall" ><i class="fa fa-chevron-down fa-lg"></i></button>      
+      <input class="text" type="text" placeholder="What needs to be done?">
+      <input class="save" type="submit" value="Add">
+    </div>
+
+    <ul class="items">
+
+      <!-- <li class="item">
+        <input class="checkbox" type="checkbox" checked="" >
+        <p class="">text</p>
+        <div class="destroy">
+        <button >
+          <i class="fa fa-close"></i>
+        </button>
+        </div>
+      </li> -->
+
+
+
+
+      
+    </ul>
+
+    <div class="tail">
+      <p>items left</p>
+      <div class="selector">
+        <button id="all" class="onclick">All</button>
+        <button id="active" class="nothover">Active</button>
+        <button id="completed" class="nothover">Completed</button>
+      </div>
+      <div class="clearfinished">Clear completed</div>
+    </div> 
+          
+
+  </div>
+
+  <footer>
+    <br>
+    <br>
+    <p>A To-do list demo</p>
+    <p>Written by 🥤</p>
+  </footer>
+
+  <script src="index.js"></script>
+</body>
+</html>
