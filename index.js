@@ -486,9 +486,6 @@ save.addEventListener('click', () => {
       }      
     })
 
-
-
-
     let rawHTML = p.innerHTML;    
     checkbox.addEventListener('change', () => {
       // 找到这是第几个checkbox，改storage的状态
@@ -497,7 +494,6 @@ save.addEventListener('click', () => {
       while (indexCheckbox[index] != checkbox) {
         index++;
       }
-
 
       // 修改p的样式
       if (checkbox.checked) {
@@ -530,9 +526,7 @@ save.addEventListener('click', () => {
           finishAll.style.color = "black";          
         }
       }
-
     })
-
     destroyButtonAppear();
 
   }
@@ -591,7 +585,7 @@ let showLeft = function () {
     }
   }
 
-  if (count == 1) {
+  if (count == 1||count==0) {
     n.innerHTML = count + " item left";
   }
   else {
@@ -603,7 +597,7 @@ showLeft();
 container.addEventListener('click', () => {
   setTimeout(() => {
     showLeft();
-  },40)
+  },20)
   
 })
 

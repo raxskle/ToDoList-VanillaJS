@@ -103,6 +103,7 @@ ul li {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  max-width: 800px;
 }
 
 li p {
@@ -110,6 +111,11 @@ li p {
   width: 650px;
   margin: 0;
   padding: 0;
+  max-width: 650px;
+  overflow: hidden;
+  height: auto;
+  word-wrap: break-word;
+  word-break: break-all;
 }
 
 .checkbox {
