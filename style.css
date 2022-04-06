@@ -126,6 +126,7 @@ li p {
   outline: none;
 }
 
+
 .destroy {
   width: 20px;
   height: 20px;
@@ -197,4 +198,24 @@ i {
 
 .selector .onclick {
   border: 1px solid rgba(168, 63, 63, 0.384);
+}
+
+.dbchange {
+  position: absolute;
+  height: 38px;
+  width: 732px;
+  margin-left: 50px;
+  outline: none;
+  font-size: 20px;
+  display: none;
+}
+
+.dbchangeclick {
+  position: absolute;
+  height: 38px;
+  width: 732px;
+  margin-left: 50px;
+  outline: none;
+  font-size: 20px;  
+  display: block; 
 }

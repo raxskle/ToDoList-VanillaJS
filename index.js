@@ -18,11 +18,152 @@ let destroyButtonAppear = function () {
 }
 destroyButtonAppear();
 
+// 初始化子函数
+let init = function (i,finishAllFlag,finishAllFlag3) {
+  // 创建一堆节点
+  const item = document.createElement('li');
+  item.className = 'item';
+  const checkbox = document.createElement('input');
+  checkbox.className = 'checkbox';
+  checkbox.type = 'checkbox';
+  const p = document.createElement('p');
+  const destroy = document.createElement('div');
+  const button = document.createElement('button');
+  destroy.className = 'destroy';
+  const icon = document.createElement('i');
+  icon.className = 'fa fa-close';
+  button.appendChild(icon);
+  item.appendChild(checkbox);
+  item.appendChild(p);
+  item.appendChild(destroy);
+  items.appendChild(item); 
+  destroy.appendChild(button);   
+
+  // 插入text
+  p.innerText = localList[i].text; 
+  // 设置checkbox状态
+  if (localList[i].checked == "true") {
+    checkbox.checked = "true";
+    p.style.textDecoration="line-through";
+    p.style.color = "rgb(163, 163, 163)";    
+  }
+  else if (localList[i].checked == "false") {
+    checkbox.checked = null;
+    p.style.textDecoration="none";
+    p.style.color = "black";
+    finishAllFlag3 = false;
+  }        
+  
+
+  // 添加destroy功能，在创建条目时就要加入
+  destroy.addEventListener('click', () => {
+    let index = 0;
+    while (items.children[index] != destroy.parentNode) {
+      index++;
+    }
+    localList.splice(index,1);
+    localStorage.todolist = JSON.stringify(localList);
+
+    items.removeChild(destroy.parentNode);    
+    let checkbox = document.querySelectorAll(".checkbox");
+    let finishAllFlag4 = true;
+    for (let i = 0; i < checkbox.length; i++){
+      if (!checkbox[i].checked) {
+        finishAllFlag4 = false;
+      }
+    }
+    if (finishAllFlag4 == true) {
+      finishAll.style.color = "black";
+      finishAllFlag = true;
+    }
+  })
+
+  // 添加finish功能
+  // 点击触发，勾上就将p的classname改了，
+  // 检查所有checkbox是否都勾上，是就finishall改true
+  // 不是就finishall改false
+  checkbox.addEventListener('change', () => {
+    // 找到这是第几个checkbox，改storage的状态
+    let index = 0;
+    const indexCheckbox = document.querySelectorAll('.checkbox');
+    while (indexCheckbox[index] != checkbox) {
+      index++;
+    }
+
+    // 修改p的样式
+    if (checkbox.checked) {
+      p.style.textDecoration="line-through";
+      p.style.color = "rgb(163, 163, 163)";    
+      localList[i].checked = "true";   
+      localStorage.todolist = JSON.stringify(localList);
+    }
+    else {
+      p.style.textDecoration="none";
+      p.style.color = "black";
+      localList[i].checked = "false";     
+      localStorage.todolist = JSON.stringify(localList);
+    }
+
+    // 检查是否finishall
+    for (let i = 0; i < items.children.length; i++){
+      let checkbox = document.querySelectorAll('.checkbox');
+      let finishAllFlag2 = true;
+      for (let j = 0; j < checkbox.length; j++){
+        if (!checkbox[j].checked) {
+          finishAllFlag = false;
+          finishAllFlag2 = false;
+          finishAll.style.color = "rgb(163, 163, 163)";
+          break;
+        }
+      }
+      if (finishAllFlag2 == true) {
+        finishAllFlag = true;
+        finishAll.style.color = "black";          
+      }
+    }
+
+  })
+
+  // double click
+  const textarea = document.createElement('input');  
+  textarea.type = "text";
+  textarea.className = "dbchange";
+  item.appendChild(textarea);
+  p.addEventListener('dblclick', () => {
+    if (localList[i].checked == "false") {
+      textarea.value = p.innerText;  
+      textarea.className = "dbchangeclick";
+      textarea.focus();
+
+      document.addEventListener('keyup', (e) => {
+        if (e.key == "Enter") {
+          textarea.blur();
+        }
+      })
+      checkbox.disabled = "true";
+
+    }
+  })
+
+  textarea.addEventListener("blur", () => {
+    textarea.className = "dbchange";    
+    if (textarea.value) {
+    p.innerText = textarea.value;
+    localList[i].text = p.innerText;
+    localStorage.todolist = JSON.stringify(localList);
+    }
+    checkbox.disabled = null;  
+  })    
+
+
+  return finishAllFlag3;
+    
+}
+
 // 初始化
 let localList = [];
 let finishAllFlag = false;
-
-let ShowALL = function () {
+let Show = function (type) {
   //检查是否storage存有list
   let finishAllFlag = false;
   finishAll.style.color = "rgb(163, 163, 163)";
@@ -31,391 +172,35 @@ let ShowALL = function () {
     localList = JSON.parse(localStorage.todolist);
     let finishAllFlag3 = true;
 
-    for (let i = 0; i < localList.length; i++){
-      // 创建一堆节点
-      const item = document.createElement('li');
-      item.className = 'item';
-      const checkbox = document.createElement('input');
-      checkbox.className = 'checkbox';
-      checkbox.type = 'checkbox';
-      const p = document.createElement('p');
-      const destroy = document.createElement('div');
-      const button = document.createElement('button');
-      destroy.className = 'destroy';
-      const icon = document.createElement('i');
-      icon.className = 'fa fa-close';
-      button.appendChild(icon);
-      item.appendChild(checkbox);
-      item.appendChild(p);
-      item.appendChild(destroy);
-      items.appendChild(item); 
-      destroy.appendChild(button);   
-
-      // 插入text
-      p.innerHTML = localList[i].text;
-      let rawHTML = localList[i].text;   
-      // 设置checkbox状态
-      if (localList[i].checked == "true") {
-        checkbox.checked = "true";
-        p.innerHTML = "<del>" + rawHTML + "</del>";
-        p.style.color = "rgb(163, 163, 163)";    
-      }
-      else if (localList[i].checked == "false") {
-        checkbox.checked = null;
-        p.innerHTML = rawHTML;
-        p.style.color = "black";
-        finishAllFlag3 = false;
-      }
-
-      // 添加destroy功能，在创建条目时就要加入
-      destroy.addEventListener('click', () => {
-        let index = 0;
-        while (items.children[index] != destroy.parentNode) {
-          index++;
-        }
-        localList.splice(index,1);
-        localStorage.todolist = JSON.stringify(localList);
-
-        items.removeChild(destroy.parentNode);    
-        let checkbox = document.querySelectorAll(".checkbox");
-        let finishAllFlag4 = true;
-        for (let i = 0; i < checkbox.length; i++){
-          if (!checkbox[i].checked) {
-            finishAllFlag4 = false;
-          }
-        }
-        if (finishAllFlag4 == true) {
-          finishAll.style.color = "black";
-          finishAllFlag = true;
-        }
-      })
-
-      // 添加finish功能
-      // 检查所有checkbox是否都勾上，是就finishall改true
-      // 不是就finishall改false
-      checkbox.addEventListener('change', () => {
-        // 找到这是第几个checkbox，改storage的状态
-        let index = 0;
-        const indexCheckbox = document.querySelectorAll('.checkbox');
-        while (indexCheckbox[index] != checkbox) {
-          index++;
-        }
-
-        // 修改p的样式
-        if (checkbox.checked) {
-          p.innerHTML = "<del>" + rawHTML + "</del>";
-          p.style.color = "rgb(163, 163, 163)";    
-          localList[index].checked = "true";   
-          localStorage.todolist = JSON.stringify(localList);
-        }
-        else {
-          p.innerHTML = rawHTML;
-          p.style.color = "black";
-          localList[index].checked = "false";     
-          localStorage.todolist = JSON.stringify(localList);
-        }
-
-        // 检查是否finishall
-        for (let i = 0; i < items.children.length; i++){
-          let checkbox = document.querySelectorAll('.checkbox');
-          let finishAllFlag2 = true;
-          for (let j = 0; j < checkbox.length; j++){
-            if (!checkbox[j].checked) {
-              finishAllFlag = false;
-              finishAllFlag2 = false;
-              finishAll.style.color = "rgb(163, 163, 163)";
-              break;
-            }
-          }
-          if (finishAllFlag2 == true) {
-            finishAllFlag = true;
-            finishAll.style.color = "black";          
-          }
-        }
-
-      })
-
-    }  
-    if (finishAllFlag3 == true) {
-      finishAllFlag = true;
-      const finishAll = document.querySelector('.finishall');
-      finishAll.style.color = 'black';
+    if (type == "showall") {
+      for (let i = 0; i < localList.length; i++){
+        finishAllFlag3=init(i,finishAllFlag,finishAllFlag3);
+      }        
     }
-
-    destroyButtonAppear();
-  }  
-}
-
-ShowALL();
-
-
-//#region
-let ShowActive = function () {
-  let finishAllFlag = false;
-  finishAll.style.color = "rgb(163, 163, 163)";
-  //检查是否storage存有list
-  if (localStorage.todolist) {
-    // 读取
-    localList = JSON.parse(localStorage.todolist);
-
-    let finishAllFlag3 = true;
-
-    for (let i = 0; i < localList.length; i++){
-      if (localList[i].checked == "false") {
-          // 创建一堆节点
-        const item = document.createElement('li');
-        item.className = 'item';
-        const checkbox = document.createElement('input');
-        checkbox.className = 'checkbox';
-        checkbox.type = 'checkbox';
-        const p = document.createElement('p');
-        const destroy = document.createElement('div');
-        const button = document.createElement('button');
-        destroy.className = 'destroy';
-        const icon = document.createElement('i');
-        icon.className = 'fa fa-close';
-        button.appendChild(icon);
-        item.appendChild(checkbox);
-        item.appendChild(p);
-        item.appendChild(destroy);
-        items.appendChild(item); 
-        destroy.appendChild(button);   
-
-        // 插入text
-        p.innerHTML = localList[i].text;
-        let rawHTML = localList[i].text;   
-        // 设置checkbox状态
+    else if (type == "showactive") {
+      for (let i = 0; i < localList.length; i++){
+        if (localList[i].checked == "false") {
+          finishAllFlag3=init(i,finishAllFlag,finishAllFlag3);
+        }
+      }        
+    }
+    else if (type == "showcompleted") {
+      for (let i = 0; i < localList.length; i++){
         if (localList[i].checked == "true") {
-          checkbox.checked = "true";
-          p.innerHTML = "<del>" + rawHTML + "</del>";
-          p.style.color = "rgb(163, 163, 163)";    
+          finishAllFlag3=init(i,finishAllFlag,finishAllFlag3);
         }
-        else if (localList[i].checked == "false") {
-          checkbox.checked = null;
-          p.innerHTML = rawHTML;
-          p.style.color = "black";
-          finishAllFlag3 = false;
-        }        
-        
-        // 添加destroy功能，在创建条目时就要加入
-        destroy.addEventListener('click', () => {
-          let index = 0;
-          while (items.children[index] != destroy.parentNode) {
-            index++;
-          }
-          localList.splice(index,1);
-          localStorage.todolist = JSON.stringify(localList);
-
-          items.removeChild(destroy.parentNode);    
-          let checkbox = document.querySelectorAll(".checkbox");
-          let finishAllFlag4 = true;
-          for (let i = 0; i < checkbox.length; i++){
-            if (!checkbox[i].checked) {
-              finishAllFlag4 = false;
-            }
-          }
-          if (finishAllFlag4 == true) {
-            finishAll.style.color = "black";
-            finishAllFlag = true;
-          }
-        })
-
-        // 添加finish功能
-        // 点击触发，勾上就将p的classname改了，
-        // 检查所有checkbox是否都勾上，是就finishall改true
-        // 不是就finishall改false
-        checkbox.addEventListener('change', () => {
-          // 找到这是第几个checkbox，改storage的状态
-          let index = 0;
-          const indexCheckbox = document.querySelectorAll('.checkbox');
-          while (indexCheckbox[index] != checkbox) {
-            index++;
-          }
-
-          // 修改p的样式
-          if (checkbox.checked) {
-            p.innerHTML = "<del>" + rawHTML + "</del>";
-            p.style.color = "rgb(163, 163, 163)";    
-            localList[index].checked = "true";   
-            localStorage.todolist = JSON.stringify(localList);
-          }
-          else {
-            p.innerHTML = rawHTML;
-            p.style.color = "black";
-            localList[index].checked = "false";     
-            localStorage.todolist = JSON.stringify(localList);
-          }
-
-          // 检查是否finishall
-          for (let i = 0; i < items.children.length; i++){
-            let checkbox = document.querySelectorAll('.checkbox');
-            let finishAllFlag2 = true;
-            for (let j = 0; j < checkbox.length; j++){
-              if (!checkbox[j].checked) {
-                finishAllFlag = false;
-                finishAllFlag2 = false;
-                finishAll.style.color = "rgb(163, 163, 163)";
-                break;
-              }
-            }
-            if (finishAllFlag2 == true) {
-              finishAllFlag = true;
-              finishAll.style.color = "black";          
-            }
-          }
-
-        })
-          
-      }
-
-    }  
-
+      }        
+    }
+    console.log(finishAllFlag3);
     if (finishAllFlag3 == true) {
       finishAllFlag = true;
       const finishAll = document.querySelector('.finishall');
       finishAll.style.color = 'black';
     }
-
     destroyButtonAppear();
-  }  
+  }    
 }
-
-//#endregion
-
-//#region
-let ShowCompleted = function () {
-  let finishAllFlag = false;
-  finishAll.style.color = "rgb(163, 163, 163)";
-  //检查是否storage存有list
-  if (localStorage.todolist) {
-    // 读取
-    localList = JSON.parse(localStorage.todolist);
-
-    let finishAllFlag3 = true;
-
-    for (let i = 0; i < localList.length; i++){
-      if (localList[i].checked == "true") {
-          // 创建一堆节点
-        const item = document.createElement('li');
-        item.className = 'item';
-        const checkbox = document.createElement('input');
-        checkbox.className = 'checkbox';
-        checkbox.type = 'checkbox';
-        const p = document.createElement('p');
-        const destroy = document.createElement('div');
-        const button = document.createElement('button');
-        destroy.className = 'destroy';
-        const icon = document.createElement('i');
-        icon.className = 'fa fa-close';
-        button.appendChild(icon);
-        item.appendChild(checkbox);
-        item.appendChild(p);
-        item.appendChild(destroy);
-        items.appendChild(item); 
-        destroy.appendChild(button);   
-
-        // 插入text
-        p.innerHTML = localList[i].text;
-        let rawHTML = localList[i].text;   
-        // 设置checkbox状态
-        if (localList[i].checked == "true") {
-          checkbox.checked = "true";
-          p.innerHTML = "<del>" + rawHTML + "</del>";
-          p.style.color = "rgb(163, 163, 163)";    
-        }
-        else if (localList[i].checked == "false") {
-          checkbox.checked = null;
-          p.innerHTML = rawHTML;
-          p.style.color = "black";
-          finishAllFlag3 = false;
-        }        
-        
-
-        // 添加destroy功能，在创建条目时就要加入
-        destroy.addEventListener('click', () => {
-          let index = 0;
-          while (items.children[index] != destroy.parentNode) {
-            index++;
-          }
-          localList.splice(index,1);
-          localStorage.todolist = JSON.stringify(localList);
-
-          items.removeChild(destroy.parentNode);    
-          let checkbox = document.querySelectorAll(".checkbox");
-          let finishAllFlag4 = true;
-          for (let i = 0; i < checkbox.length; i++){
-            if (!checkbox[i].checked) {
-              finishAllFlag4 = false;
-            }
-          }
-          if (finishAllFlag4 == true) {
-            finishAll.style.color = "black";
-            finishAllFlag = true;
-          }
-        })
-
-        // 添加finish功能
-        // 点击触发，勾上就将p的classname改了，
-        // 检查所有checkbox是否都勾上，是就finishall改true
-        // 不是就finishall改false
-        checkbox.addEventListener('change', () => {
-          // 找到这是第几个checkbox，改storage的状态
-          let index = 0;
-          const indexCheckbox = document.querySelectorAll('.checkbox');
-          while (indexCheckbox[index] != checkbox) {
-            index++;
-          }
-
-          // 修改p的样式
-          if (checkbox.checked) {
-            p.innerHTML = "<del>" + rawHTML + "</del>";
-            p.style.color = "rgb(163, 163, 163)";    
-            localList[index].checked = "true";   
-            localStorage.todolist = JSON.stringify(localList);
-          }
-          else {
-            p.innerHTML = rawHTML;
-            p.style.color = "black";
-            localList[index].checked = "false";     
-            localStorage.todolist = JSON.stringify(localList);
-          }
-
-          // 检查是否finishall
-          for (let i = 0; i < items.children.length; i++){
-            let checkbox = document.querySelectorAll('.checkbox');
-            let finishAllFlag2 = true;
-            for (let j = 0; j < checkbox.length; j++){
-              if (!checkbox[j].checked) {
-                finishAllFlag = false;
-                finishAllFlag2 = false;
-                finishAll.style.color = "rgb(163, 163, 163)";
-                break;
-              }
-            }
-            if (finishAllFlag2 == true) {
-              finishAllFlag = true;
-              finishAll.style.color = "black";          
-            }
-          }
-
-        })
-          
-      }
-
-    }  
-
-    if (finishAllFlag3 == true) {
-      finishAllFlag = true;
-      const finishAll = document.querySelector('.finishall');
-      finishAll.style.color = 'black';
-    }
-
-    destroyButtonAppear();
-  }  
-}
-
-//#endregion
-
+Show("showall");
 
 save.addEventListener('click', () => {
   if (text.value) {
@@ -433,12 +218,14 @@ save.addEventListener('click', () => {
     localStorage.todolist = JSON.stringify(localList);
     text.value = '';  
 
-    // 得到已显示的列表
-    let itemCount = document.querySelectorAll('.item');
-    let count = itemCount.length;
-    
     // 读取
-    localList = JSON.parse(localStorage.todolist);
+    localList = JSON.parse(localStorage.todolist);    
+    let count = localList.length - 1;
+    
+    const completed = document.querySelector("#completed");
+    if (completed.className == "onclick") {
+      return ;
+    }
 
     // 将新加的显示出来
       // 创建一堆节点
@@ -461,11 +248,12 @@ save.addEventListener('click', () => {
     destroy.appendChild(button);   
 
     // 插入text
-    p.innerHTML = localList[count].text;
+    p.innerText = localList[count].text;
+
 
     // 添加destroy
     destroy.addEventListener('click', () => {
-      let index = 0;
+      let index = 0;  
       while (items.children[index] != destroy.parentNode) {
         index++;
       }
@@ -486,7 +274,7 @@ save.addEventListener('click', () => {
       }      
     })
 
-    let rawHTML = p.innerHTML;    
+    let rawHTML = p.innerText;    
     checkbox.addEventListener('change', () => {
       // 找到这是第几个checkbox，改storage的状态
       let index = 0;
@@ -497,13 +285,13 @@ save.addEventListener('click', () => {
 
       // 修改p的样式
       if (checkbox.checked) {
-        p.innerHTML = "<del>" + rawHTML + "</del>";
+        p.style.textDecoration="line-through";
         p.style.color = "rgb(163, 163, 163)";    
         localList[index].checked = "true";   
         localStorage.todolist = JSON.stringify(localList);
       }
       else {
-        p.innerHTML = rawHTML;
+        p.style.textDecoration="none";
         p.style.color = "black";
         localList[index].checked = "false";     
         localStorage.todolist = JSON.stringify(localList);
@@ -529,8 +317,36 @@ save.addEventListener('click', () => {
     })
     destroyButtonAppear();
 
-  }
+      // double click
+    const textarea = document.createElement('input');  
+    textarea.type = "text";
+    textarea.className = "dbchange";
+    item.appendChild(textarea);
+    textarea.value = p.innerText;  
+    p.addEventListener('dblclick', () => {
+      if (localList[count].checked == "false") {
+        textarea.className = "dbchangeclick";
+        textarea.focus();
 
+        document.addEventListener('keyup', (e) => {
+          if (e.key == "Enter") {
+            textarea.blur();
+          }
+        })
+        checkbox.disabled = "true";
+
+      }
+    })
+
+    textarea.addEventListener("blur", () => {
+      textarea.className = "dbchange";    
+      p.innerText = textarea.value;
+      localList[count].text = p.innerText;
+      localStorage.todolist = JSON.stringify(localList);
+      checkbox.disabled = null;
+    })
+    
+  }
 })
 
 // finishall
@@ -541,7 +357,7 @@ finishAll.addEventListener('click', () => {
     for (let i = 0; i < checkbox.length; i++){
       if (!checkbox[i].checked) {
         checkbox[i].checked = "true";
-        p[i].innerHTML = "<del>" + p[i].innerHTML + "</del>";
+        p[i].style.textDecoration="line-through";
         p[i].style.color = "rgb(163, 163, 163)";     
       }
     }
@@ -558,7 +374,7 @@ finishAll.addEventListener('click', () => {
     for (let i = 0; i < checkbox.length; i++){
       if (checkbox[i].checked) {
         checkbox[i].checked = null;
-        p[i].innerHTML = p[i].innerHTML.slice(5,-6);
+        p[i].style.textDecoration="none";
         p[i].style.color = "black";          
       }
     
@@ -586,10 +402,10 @@ let showLeft = function () {
   }
 
   if (count == 1||count==0) {
-    n.innerHTML = count + " item left";
+    n.innerText = count + " item left";
   }
   else {
-    n.innerHTML = count + " items left";
+    n.innerText = count + " items left";
   }
 }
 showLeft();
@@ -679,7 +495,7 @@ all.addEventListener('click', () => {
     items.removeChild(childs[i]);   
     i--;//重要！因为减了节点 后面的index就减一
   }
-  ShowALL();
+  Show("showall");
 })
 
 active.addEventListener('click', () => {
@@ -688,7 +504,7 @@ active.addEventListener('click', () => {
     items.removeChild(childs[i]);   
     i--;//重要！因为减了节点 后面的index就减一
   }
-  ShowActive();
+  Show("showactive");
 })
 
 completed.addEventListener('click', () => {
@@ -697,6 +513,5 @@ completed.addEventListener('click', () => {
     items.removeChild(childs[i]);   
     i--;//重要！因为减了节点 后面的index就减一
   }
-  ShowCompleted();
+  Show("showcompleted");
 })
-
